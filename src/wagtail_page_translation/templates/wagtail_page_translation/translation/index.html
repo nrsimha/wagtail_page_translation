@@ -1,0 +1,59 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailadmin_tags %}
+{% load i18n %}
+
+{% block titletag %}{% blocktrans with title=page.get_admin_display_title %}Translations of {{ title }}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+    <style>
+        .translations .listing .index {
+            background-color: inherit;
+        }
+        .translations .listing .index .actions {
+            margin-top: .2em;
+        }
+    </style>
+
+    {% trans "Translations of" as revisions_str %}
+    {% include "wagtailadmin/shared/header.html" with title=revisions_str subtitle=page.get_admin_display_title icon="doc-empty-inverse" %}
+
+    <div class="nice-padding">
+        <div id="translations-results" class="translations">
+            <table class="listing">
+                <thead>
+                <tr>
+                    <th class="title">{% trans "Title" %}</th>
+                    <th class="language">{% trans "Language" %}</th>
+                    <th class="slug">{% trans "Slug" %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for language in languages %}
+                    <tr{% if not language.translation %} class="index"{% endif %}>
+                        <td class="title">
+                            {% if language.translation %}
+                                <h2>
+                                    <a href="{% url 'wagtailadmin_pages:edit' language.translation.pk %}">{{ language.translation }}</a>
+                                </h2>
+                                <ul class="actions">
+                                    {% page_listing_buttons page page_perms %}
+                                </ul>
+                            {% else %}
+                            <ul class="actions">
+                                <li><a href="{% url 'wagtail_page_translation:add_translation' page.pk language.language.code %}" class="button button-small button-secondary">{% trans 'Add translation' %}</a></li>
+                            </ul>
+                            {% endif %}
+                        </td>
+                        <td class="language">{{ language.language }}</td>
+                        <td class="slug">
+                            {% if language.translation %}
+                                {{ language.translation.slug }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
